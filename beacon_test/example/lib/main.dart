@@ -213,64 +213,78 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blueGrey,
+      ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Monitoring Beacons'),
+          title: const Text('Find Your Spot'),
         ),
-        body: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Center(
-                  child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('Total Results: $_nrMessagesReceived',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontSize: 14,
-                          color: const Color(0xFF22369C),
-                          fontWeight: FontWeight.bold,
-                        )),
-              )),
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (isRunning) {
-                      await BeaconsPlugin.stopMonitoring();
-                    } else {
-                      initPlatformState();
-                      await BeaconsPlugin.startMonitoring();
-                    }
-                    setState(() {
-                      isRunning = !isRunning;
-                    });
-                  },
-                  child: Text(isRunning ? 'Stop Scanning' : 'Start Scanning',
-                      style: TextStyle(fontSize: 20)),
-                ),
-              ),
-              Visibility(
-                visible: _results.isNotEmpty,
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        _nrMessagesReceived = 0;
-                        _results.clear();
-                      });
-                    },
-                    child:
-                        Text("Clear Results", style: TextStyle(fontSize: 20)),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Expanded(child: _buildResultsList())
-            ],
+        // body: Center(
+        //   child: Column(
+        //     crossAxisAlignment: CrossAxisAlignment.stretch,
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: <Widget>[
+        //       Center(
+        //           child: Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: Text('Total Results: $_nrMessagesReceived',
+        //             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+        //                   fontSize: 14,
+        //                   color: const Color(0xFF22369C),
+        //                   fontWeight: FontWeight.bold,
+        //                 )),
+        //       )),
+        //       Padding(
+        //         padding: const EdgeInsets.all(2.0),
+        //         child: ElevatedButton(
+        //           onPressed: () async {
+        //             if (isRunning) {
+        //               await BeaconsPlugin.stopMonitoring();
+        //             } else {
+        //               initPlatformState();
+        //               await BeaconsPlugin.startMonitoring();
+        //             }
+        //             setState(() {
+        //               isRunning = !isRunning;
+        //             });
+        //           },
+        //           child: Text(isRunning ? 'Stop Scanning' : 'Start Scanning',
+        //               style: TextStyle(fontSize: 20)),
+        //         ),
+        //       ),
+        //       Visibility(
+        //         visible: _results.isNotEmpty,
+        //         child: Padding(
+        //           padding: const EdgeInsets.all(2.0),
+        //           child: ElevatedButton(
+        //             onPressed: () async {
+        //               setState(() {
+        //                 _nrMessagesReceived = 0;
+        //                 _results.clear();
+        //               });
+        //             },
+        //             child:
+        //                 Text("Clear Results", style: TextStyle(fontSize: 20)),
+        //           ),
+        //         ),
+        //       ),
+        //       SizedBox(
+        //         height: 20.0,
+        //       ),
+        //       Expanded(child: _buildResultsList())
+        //     ],
+        //   ),
+        // ),
+        body: InteractiveViewer(
+          boundaryMargin: // EdgeInsets.all(400),
+              EdgeInsets.only(top: 300, left: 180, right: 180, bottom: 220),
+          minScale: 0.5,
+          maxScale: 2.0,
+          child: CustomPaint(
+            painter: ShapePainter(),
+            child: Container(),
           ),
         ),
       ),
@@ -327,5 +341,160 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         },
       ),
     );
+  }
+}
+
+class MyPainter extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Find Your Spot'),
+      ),
+      body: InteractiveViewer(
+        boundaryMargin: // EdgeInsets.all(400),
+            EdgeInsets.only(top: 300, left: 180, right: 180, bottom: 220),
+        minScale: 0.5,
+        maxScale: 2.0,
+        child: CustomPaint(
+          painter: ShapePainter(),
+          child: Container(),
+        ),
+      ),
+    );
+  }
+}
+
+class ShapePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Background 1 color
+    var background1Paint = Paint();
+
+    var mainBackground = Path();
+
+    mainBackground.addRect(Rect.fromLTRB(-400, -400, 800, 1000));
+    background1Paint.color = Colors.grey.shade500;
+
+    canvas.drawPath(mainBackground, background1Paint);
+    // Background 2 color
+    var background2Paint = Paint();
+
+    var parkingLotBackground = Path();
+
+    parkingLotBackground.addRect(Rect.fromLTRB(-120, -230, 490, 670));
+    background2Paint.color = Colors.grey.shade700;
+
+    canvas.drawPath(parkingLotBackground, background2Paint);
+
+    var paint = Paint()
+      ..color = Colors.yellow
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+
+    final spotLength = 5.8 * 10;
+    final spotWidth = 2.5 * 10;
+    final laneWidth = 6.87 * 10;
+    final mainRoadWidth = 9.4 * 10;
+    final left = -(spotLength + laneWidth / 2);
+
+    var startingPointA = Offset(0, 0);
+    var endingPointA = Offset(size.width, 0);
+    var startingPointZ = Offset(0, 0);
+    var endingPointZ = Offset(size.width, 0);
+    var startingPoint1 = Offset(0, 0);
+    var endingPoint1 = Offset(size.width, 0);
+    var startingPoint2 = Offset(0, 0);
+    var endingPoint2 = Offset(size.width, 0);
+    var startingPoint3 = Offset(0, 0);
+    var endingPoint3 = Offset(size.width, 0);
+    var startingPoint4 = Offset(0, 0);
+    var endingPoint4 = Offset(size.width, 0);
+
+    var startingPoint5 = Offset(0, 0);
+    var endingPoint5 = Offset(size.width, 0);
+    var startingPoint6 = Offset(0, 0);
+    var endingPoint6 = Offset(size.width, 0);
+    var startingPoint7 = Offset(0, 0);
+    var endingPoint7 = Offset(size.width, 0);
+    var startingPoint8 = Offset(0, 0);
+    var endingPoint8 = Offset(size.width, 0);
+    // print(size);
+
+    startingPointA = Offset(left, -200);
+    endingPointA = Offset(6 * spotLength + 3 * laneWidth + left, -200);
+    canvas.drawLine(startingPointA, endingPointA, paint);
+
+    startingPointZ = Offset(left, 644);
+    endingPointZ = Offset(6 * spotLength + 3 * laneWidth + left,
+        -200 + 30 * spotWidth + mainRoadWidth);
+    canvas.drawLine(startingPointZ, endingPointZ, paint);
+
+    // Horizontal Lines
+    for (var i = -200.0; i <= 550; i += spotWidth) {
+      startingPoint1 = Offset(left, i.toDouble());
+      endingPoint1 = Offset(spotLength + left, i.toDouble());
+      canvas.drawLine(startingPoint1, endingPoint1, paint);
+      startingPoint2 = Offset(spotLength + laneWidth + left, i.toDouble());
+      endingPoint2 = Offset(3 * spotLength + laneWidth + left, i.toDouble());
+      canvas.drawLine(startingPoint2, endingPoint2, paint);
+      startingPoint3 =
+          Offset(3 * spotLength + 2 * laneWidth + left, i.toDouble());
+      endingPoint3 =
+          Offset(5 * spotLength + 2 * laneWidth + left, i.toDouble());
+      canvas.drawLine(startingPoint3, endingPoint3, paint);
+      startingPoint4 =
+          Offset(5 * spotLength + 3 * laneWidth + left, i.toDouble());
+      endingPoint4 =
+          Offset(6 * spotLength + 3 * laneWidth + left, i.toDouble());
+      canvas.drawLine(startingPoint4, endingPoint4, paint);
+    }
+
+    // Vertical Lines
+    startingPoint5 = Offset(left, -200);
+    endingPoint5 = Offset(left, -200 + 30 * spotWidth + mainRoadWidth);
+    canvas.drawLine(startingPoint5, endingPoint5, paint);
+    startingPoint6 = Offset(2 * spotLength + laneWidth + left, -200);
+    endingPoint6 = Offset(2 * spotLength + laneWidth + left, 550);
+    canvas.drawLine(startingPoint6, endingPoint6, paint);
+    startingPoint7 = Offset(4 * spotLength + 2 * laneWidth + left, -200);
+    endingPoint7 = Offset(4 * spotLength + 2 * laneWidth + left, 550);
+    canvas.drawLine(startingPoint7, endingPoint7, paint);
+    startingPoint8 = Offset(6 * spotLength + 3 * laneWidth + left, -200);
+    endingPoint8 = Offset(6 * spotLength + 3 * laneWidth + left,
+        -200 + 30 * spotWidth + mainRoadWidth);
+    canvas.drawLine(startingPoint8, endingPoint8, paint);
+
+    // // Car_icon
+    // var carIcon = Paint()
+    //   ..color = Colors.blue
+    //   ..strokeWidth = 3
+    //   ..strokeCap = StrokeCap.round;
+
+    // var triangle0 = Offset(400, 600);
+    // var triangle1 = Offset(420, 593);
+    // var triangle2 = Offset(420, 607);
+    // canvas.drawLine(triangle0, triangle1, carIcon);
+    // canvas.drawLine(triangle0, triangle2, carIcon);
+    // canvas.drawLine(triangle1, triangle2, carIcon);
+
+    // // Route
+    // var routh = Paint()
+    //   ..color = Colors.blue
+    //   ..strokeWidth = 3
+    //   ..strokeCap = StrokeCap.round;
+
+    // var routh0 = Offset(395, 600);
+    // var routh1 = Offset(185, 600);
+    // var routh2 = Offset(185, 188);
+    // var routh3 = Offset(120, 188);
+    // canvas.drawLine(routh0, routh1, routh);
+    // canvas.drawLine(routh1, routh2, routh);
+    // canvas.drawLine(routh2, routh3, routh);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
   }
 }
