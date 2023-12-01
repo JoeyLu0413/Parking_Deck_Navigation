@@ -232,7 +232,8 @@ class MyPainter extends StatelessWidget {
       ),
       body: InteractiveViewer(
         boundaryMargin: // EdgeInsets.all(400),
-            EdgeInsets.only(top: 300, left: 180, right: 180, bottom: 220),
+            // EdgeInsets.only(top: 300, left: 180, right: 180, bottom: 220),
+            EdgeInsets.only(top: 100, left: 90, right: 270, bottom: 420),
         minScale: 0.5,
         maxScale: 2.0,
         child: CustomPaint(
@@ -261,7 +262,8 @@ class ShapePainter extends CustomPainter {
 
     var parkingLotBackground = Path();
 
-    parkingLotBackground.addRect(Rect.fromLTRB(-120, -230, 490, 670));
+    // parkingLotBackground.addRect(Rect.fromLTRB(-120, -230, 490, 670));
+    parkingLotBackground.addRect(Rect.fromLTRB(-30, -30, 584, 870));
     background2Paint.color = Colors.grey.shade700;
 
     canvas.drawPath(parkingLotBackground, background2Paint);
@@ -271,16 +273,16 @@ class ShapePainter extends CustomPainter {
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
 
-    final spot_length = 5.8 * 10;
-    final spot_width = 2.5 * 10;
-    final lane_width = 6.87 * 10;
-    final main_road_width = 9.4 * 10;
-    final left = -(spot_length + lane_width / 2);
+    final spotLength = 5.8 * 10;
+    final spotWidth = 2.5 * 10;
+    final laneWidth = 6.87 * 10;
+    final mainRoadWidth = 9.4 * 10;
+    final left = -(spotLength + laneWidth / 2);
 
-    var startingPoint_a = Offset(0, 0);
-    var endingPoint_a = Offset(size.width, 0);
-    var startingPoint_z = Offset(0, 0);
-    var endingPoint_z = Offset(size.width, 0);
+    var startingPointA = Offset(0, 0);
+    var endingPointA = Offset(size.width, 0);
+    var startingPointZ = Offset(0, 0);
+    var endingPointZ = Offset(size.width, 0);
     var startingPoint1 = Offset(0, 0);
     var endingPoint1 = Offset(size.width, 0);
     var startingPoint2 = Offset(0, 0);
@@ -300,48 +302,91 @@ class ShapePainter extends CustomPainter {
     var endingPoint8 = Offset(size.width, 0);
     // print(size);
 
-    startingPoint_a = Offset(left, -200);
-    endingPoint_a = Offset(6 * spot_length + 3 * lane_width + left, -200);
-    canvas.drawLine(startingPoint_a, endingPoint_a, paint);
+    // startingPointA = Offset(left, -200);
+    // endingPointA = Offset(6 * spotLength + 3 * laneWidth + left, -200);
+    // canvas.drawLine(startingPointA, endingPointA, paint);
 
-    startingPoint_z = Offset(left, 644);
-    endingPoint_z = Offset(6 * spot_length + 3 * lane_width + left,
-        -200 + 30 * spot_width + main_road_width);
-    canvas.drawLine(startingPoint_z, endingPoint_z, paint);
+    // startingPointZ = Offset(left, 644);
+    // endingPointZ = Offset(6 * spotLength + 3 * laneWidth + left,
+    //     -200 + 30 * spotWidth + mainRoadWidth);
+    // canvas.drawLine(startingPointZ, endingPointZ, paint);
+
+    // // Horizontal Lines
+    // for (var i = -200.0; i <= 550; i += spotWidth) {
+    //   startingPoint1 = Offset(left, i.toDouble());
+    //   endingPoint1 = Offset(spotLength + left, i.toDouble());
+    //   canvas.drawLine(startingPoint1, endingPoint1, paint);
+    //   startingPoint2 = Offset(spotLength + laneWidth + left, i.toDouble());
+    //   endingPoint2 = Offset(3 * spotLength + laneWidth + left, i.toDouble());
+    //   canvas.drawLine(startingPoint2, endingPoint2, paint);
+    //   startingPoint3 =
+    //       Offset(3 * spotLength + 2 * laneWidth + left, i.toDouble());
+    //   endingPoint3 =
+    //       Offset(5 * spotLength + 2 * laneWidth + left, i.toDouble());
+    //   canvas.drawLine(startingPoint3, endingPoint3, paint);
+    //   startingPoint4 =
+    //       Offset(5 * spotLength + 3 * laneWidth + left, i.toDouble());
+    //   endingPoint4 =
+    //       Offset(6 * spotLength + 3 * laneWidth + left, i.toDouble());
+    //   canvas.drawLine(startingPoint4, endingPoint4, paint);
+    // }
+
+    // // Vertical Lines
+    // startingPoint5 = Offset(left, -200);
+    // endingPoint5 = Offset(left, -200 + 30 * spotWidth + mainRoadWidth);
+    // canvas.drawLine(startingPoint5, endingPoint5, paint);
+    // startingPoint6 = Offset(2 * spotLength + laneWidth + left, -200);
+    // endingPoint6 = Offset(2 * spotLength + laneWidth + left, 550);
+    // canvas.drawLine(startingPoint6, endingPoint6, paint);
+    // startingPoint7 = Offset(4 * spotLength + 2 * laneWidth + left, -200);
+    // endingPoint7 = Offset(4 * spotLength + 2 * laneWidth + left, 550);
+    // canvas.drawLine(startingPoint7, endingPoint7, paint);
+    // startingPoint8 = Offset(6 * spotLength + 3 * laneWidth + left, -200);
+    // endingPoint8 = Offset(6 * spotLength + 3 * laneWidth + left,
+    //     -200 + 30 * spotWidth + mainRoadWidth);
+    // canvas.drawLine(startingPoint8, endingPoint8, paint);
+
+    startingPointA = Offset(0, 0);
+    endingPointA = Offset(6 * spotLength + 3 * laneWidth, 0);
+    canvas.drawLine(startingPointA, endingPointA, paint);
+
+    startingPointZ = Offset(0, 844);
+    endingPointZ = Offset(
+        6 * spotLength + 3 * laneWidth, 0 + 30 * spotWidth + mainRoadWidth);
+    canvas.drawLine(startingPointZ, endingPointZ, paint);
 
     // Horizontal Lines
-    for (var i = -200.0; i <= 550; i += spot_width) {
-      startingPoint1 = Offset(left, i.toDouble());
-      endingPoint1 = Offset(spot_length + left, i.toDouble());
+    for (var i = 0.0; i <= 750.0; i += spotWidth) {
+      startingPoint1 = Offset(0, i.toDouble());
+      endingPoint1 = Offset(spotLength + 0, i.toDouble());
       canvas.drawLine(startingPoint1, endingPoint1, paint);
-      startingPoint2 = Offset(spot_length + lane_width + left, i.toDouble());
-      endingPoint2 = Offset(3 * spot_length + lane_width + left, i.toDouble());
+      startingPoint2 = Offset(spotLength + laneWidth + 0, i.toDouble());
+      endingPoint2 = Offset(3 * spotLength + laneWidth + 0, i.toDouble());
       canvas.drawLine(startingPoint2, endingPoint2, paint);
-      startingPoint3 =
-          Offset(3 * spot_length + 2 * lane_width + left, i.toDouble());
-      endingPoint3 =
-          Offset(5 * spot_length + 2 * lane_width + left, i.toDouble());
+      startingPoint3 = Offset(3 * spotLength + 2 * laneWidth + 0, i.toDouble());
+      endingPoint3 = Offset(5 * spotLength + 2 * laneWidth + 0, i.toDouble());
       canvas.drawLine(startingPoint3, endingPoint3, paint);
-      startingPoint4 =
-          Offset(5 * spot_length + 3 * lane_width + left, i.toDouble());
-      endingPoint4 =
-          Offset(6 * spot_length + 3 * lane_width + left, i.toDouble());
+      startingPoint4 = Offset(5 * spotLength + 3 * laneWidth + 0, i.toDouble());
+      endingPoint4 = Offset(6 * spotLength + 3 * laneWidth + 0, i.toDouble());
       canvas.drawLine(startingPoint4, endingPoint4, paint);
     }
 
+    // top_left (-92.35, -200), top_right (461.75, -200)
+    // bottom_left (-92.35, 644), bottom_right (461.75, 644)
+    // 844 * 554
     // Vertical Lines
-    startingPoint5 = Offset(left, -200);
-    endingPoint5 = Offset(left, -200 + 30 * spot_width + main_road_width);
+    startingPoint5 = Offset(0, 0);
+    endingPoint5 = Offset(0, 0 + 30 * spotWidth + mainRoadWidth);
     canvas.drawLine(startingPoint5, endingPoint5, paint);
-    startingPoint6 = Offset(2 * spot_length + lane_width + left, -200);
-    endingPoint6 = Offset(2 * spot_length + lane_width + left, 550);
+    startingPoint6 = Offset(2 * spotLength + laneWidth + 0, 0);
+    endingPoint6 = Offset(2 * spotLength + laneWidth + 0, 750);
     canvas.drawLine(startingPoint6, endingPoint6, paint);
-    startingPoint7 = Offset(4 * spot_length + 2 * lane_width + left, -200);
-    endingPoint7 = Offset(4 * spot_length + 2 * lane_width + left, 550);
+    startingPoint7 = Offset(4 * spotLength + 2 * laneWidth + 0, 0);
+    endingPoint7 = Offset(4 * spotLength + 2 * laneWidth + 0, 750);
     canvas.drawLine(startingPoint7, endingPoint7, paint);
-    startingPoint8 = Offset(6 * spot_length + 3 * lane_width + left, -200);
-    endingPoint8 = Offset(6 * spot_length + 3 * lane_width + left,
-        -200 + 30 * spot_width + main_road_width);
+    startingPoint8 = Offset(6 * spotLength + 3 * laneWidth + 0, 0);
+    endingPoint8 = Offset(
+        6 * spotLength + 3 * laneWidth + 0, 0 + 30 * spotWidth + mainRoadWidth);
     canvas.drawLine(startingPoint8, endingPoint8, paint);
 
     // // Car_icon
