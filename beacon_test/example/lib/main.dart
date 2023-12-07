@@ -8,6 +8,7 @@ import 'package:deepcopy/deepcopy.dart';
 import 'package:beacons_plugin/beacons_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:tuple/tuple.dart';
 
 List<String> _results = [];
 Map<String, dynamic> RSSIReport = {
@@ -53,8 +54,8 @@ Future<void> postData() async {
       return;
     }
     var response = await http.post(url, body: json.encode(_local));
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+    // print('Response status: ${response.statusCode}');
+    // print('Response body: ${response.body}');
   } catch (e, stacktrace) {
     print('Exception: ' + e.toString());
     print('Stacktrace: ' + stacktrace.toString());
@@ -76,6 +77,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   var isRunning = false;
   bool _isInForeground = true;
 
+  // draw path
+  List<Tuple2<double, double>> coordinates = [];
+  late Tuple2<double, double> user = Tuple2<double, double>(550, 450);
+  late Timer timer;
+  late Timer timer1;
+  late Timer timer2;
+
   final ScrollController _scrollController = ScrollController();
 
   final StreamController<String> beaconEventsController =
@@ -96,6 +104,78 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: null);
+
+    timer1 = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (coordinates.isEmpty) {
+        fetchData();
+      }
+    });
+
+    timer = Timer.periodic(Duration(milliseconds: 250), (timer) {
+      setState(() {
+        //generateRandomCoordinates();
+        if (coordinates.isNotEmpty) {
+          //coordinates.removeAt(0);
+          if (coordinates.length >= 7)
+            coordinates.removeRange(0, 7);
+          else
+            coordinates.removeRange(0, coordinates.length);
+        }
+      });
+    });
+    timer2 = Timer.periodic(Duration(milliseconds: 500), (timer) {
+      fetchUser();
+    });
+  }
+
+  Future<void> fetchUser() async {
+    // Replace the URL with your server's endpoint
+    // final response = await http.get(Uri.parse(
+    //     'https://2a0t2aefbb.execute-api.us-east-2.amazonaws.com/beta'));
+
+    final response =
+        await http.get(Uri.parse('http://172.20.10.5:5001/get_user_location'));
+
+    if (response.statusCode == 200 && json.decode(response.body) != null) {
+      //print(json.decode(response.body)['body']);
+      // Parse the response and update coordinates
+      //List<dynamic> jsonList = json.decode(json.decode(response.body)['body']);
+      List<dynamic> jsonList = json.decode(response.body);
+      setState(() {
+        user = Tuple2<double, double>(
+            jsonList[0].toDouble(), jsonList[1].toDouble());
+      });
+      print(user);
+    } else {
+      // Handle the error
+      print('Failed to fetch data. Status code: ${response.statusCode}');
+    }
+  }
+
+  Future<void> fetchData() async {
+    // Replace the URL with your server's endpoint
+    // final response = await http.get(Uri.parse(
+    //     'https://2a0t2aefbb.execute-api.us-east-2.amazonaws.com/beta'));
+
+    final response =
+        await http.get(Uri.parse('http://172.20.10.5:5001/get_path'));
+
+    if (response.statusCode == 200 && json.decode(response.body) != null) {
+      //print(json.decode(response.body)['body']);
+      // Parse the response and update coordinates
+      //List<dynamic> jsonList = json.decode(json.decode(response.body)['body']);
+      List<dynamic> jsonList = json.decode(response.body);
+      setState(() {
+        coordinates = jsonList
+            .map((coord) => Tuple2<double, double>(
+                coord[0].toDouble(), coord[1].toDouble()))
+            .toList();
+      });
+      print(coordinates);
+    } else {
+      // Handle the error
+      print('Failed to fetch data. Status code: ${response.statusCode}');
+    }
   }
 
   @override
@@ -221,63 +301,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         appBar: AppBar(
           title: const Text('Find Your Spot'),
         ),
-        // body: Center(
-        //   child: Column(
-        //     crossAxisAlignment: CrossAxisAlignment.stretch,
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: <Widget>[
-        //       Center(
-        //           child: Padding(
-        //         padding: const EdgeInsets.all(8.0),
-        //         child: Text('Total Results: $_nrMessagesReceived',
-        //             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-        //                   fontSize: 14,
-        //                   color: const Color(0xFF22369C),
-        //                   fontWeight: FontWeight.bold,
-        //                 )),
-        //       )),
-        //       Padding(
-        //         padding: const EdgeInsets.all(2.0),
-        //         child: ElevatedButton(
-        //           onPressed: () async {
-        //             if (isRunning) {
-        //               await BeaconsPlugin.stopMonitoring();
-        //             } else {
-        //               initPlatformState();
-        //               await BeaconsPlugin.startMonitoring();
-        //             }
-        //             setState(() {
-        //               isRunning = !isRunning;
-        //             });
-        //           },
-        //           child: Text(isRunning ? 'Stop Scanning' : 'Start Scanning',
-        //               style: TextStyle(fontSize: 20)),
-        //         ),
-        //       ),
-        //       Visibility(
-        //         visible: _results.isNotEmpty,
-        //         child: Padding(
-        //           padding: const EdgeInsets.all(2.0),
-        //           child: ElevatedButton(
-        //             onPressed: () async {
-        //               setState(() {
-        //                 _nrMessagesReceived = 0;
-        //                 _results.clear();
-        //               });
-        //             },
-        //             child:
-        //                 Text("Clear Results", style: TextStyle(fontSize: 20)),
-        //           ),
-        //         ),
-        //       ),
-        //       SizedBox(
-        //         height: 20.0,
-        //       ),
-        //       Expanded(child: _buildResultsList())
-        //     ],
-        //   ),
-        // ),
-
         body: InteractiveViewer(
           boundaryMargin:
               EdgeInsets.only(top: 100, left: 90, right: 270, bottom: 420),
@@ -285,6 +308,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           maxScale: 2.0,
           child: CustomPaint(
             painter: ShapePainter(),
+            foregroundPainter: LinesPainter(coordinates, user),
             child: Container(),
           ),
         ),
@@ -398,7 +422,6 @@ class ShapePainter extends CustomPainter {
     var endingPoint7 = Offset(size.width, 0);
     var startingPoint8 = Offset(0, 0);
     var endingPoint8 = Offset(size.width, 0);
-    // print(size);
 
     startingPointA = Offset(0, 0);
     endingPointA = Offset(6 * spotLength + 3 * laneWidth, 0);
@@ -427,7 +450,7 @@ class ShapePainter extends CustomPainter {
 
     // top_left (0, 0), top_right (554, 0)
     // bottom_left (0, 844), bottom_right (554, 844)
-    // 844 * 554
+    // map size: 844 * 554
     // Vertical Lines
     startingPoint5 = Offset(0, 0);
     endingPoint5 = Offset(0, 0 + 30 * spotWidth + mainRoadWidth);
@@ -442,44 +465,54 @@ class ShapePainter extends CustomPainter {
     endingPoint8 = Offset(
         6 * spotLength + 3 * laneWidth, 0 + 30 * spotWidth + mainRoadWidth);
     canvas.drawLine(startingPoint8, endingPoint8, paint);
-
-    // // Car_icon
-    // var carIcon = Paint()
-    //   ..color = Colors.blue
-    //   ..strokeWidth = 3
-    //   ..strokeCap = StrokeCap.round;
-
-    // // circle
-    // final center = Offset(520, 800);
-    // final radius = 10.0;
-
-    // canvas.drawCircle(center, radius, carIcon);
-
-    // // triangle
-    // var triangle0 = Offset(500, 800);
-    // var triangle1 = Offset(520, 793);
-    // var triangle2 = Offset(520, 807);
-    // canvas.drawLine(triangle0, triangle1, carIcon);
-    // canvas.drawLine(triangle0, triangle2, carIcon);
-    // canvas.drawLine(triangle1, triangle2, carIcon);
-
-    // // Route
-    // var routh = Paint()
-    //   ..color = Colors.blue
-    //   ..strokeWidth = 3
-    //   ..strokeCap = StrokeCap.round;
-
-    // var routh0 = Offset(495, 800);
-    // var routh1 = Offset(285, 800);
-    // var routh2 = Offset(285, 388);
-    // var routh3 = Offset(220, 388);
-    // canvas.drawLine(routh0, routh1, routh);
-    // canvas.drawLine(routh1, routh2, routh);
-    // canvas.drawLine(routh2, routh3, routh);
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return false;
+  }
+}
+
+class LinesPainter extends CustomPainter {
+  late List<Tuple2<double, double>> coordinates;
+  late Tuple2<double, double> user;
+  // Off x, y;
+
+  LinesPainter(
+      List<Tuple2<double, double>> coordinates, Tuple2<double, double> user) {
+    this.coordinates = coordinates;
+    this.user = user;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // route paint
+    Paint paint = Paint()
+      ..color = Colors.blue
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 3.0;
+
+    Paint circlePaint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.fill;
+
+    // Draw lines connecting the coordinates
+    for (int i = 0; i < coordinates.length - 1; i++) {
+      canvas.drawLine(Offset(coordinates[i].item1, coordinates[i].item2),
+          Offset(coordinates[i + 1].item1, coordinates[i + 1].item2), paint);
+    }
+
+    if (coordinates.isNotEmpty) {
+      canvas.drawCircle(
+        Offset(user.item2 * 50, user.item1 * 50),
+        8.0, // Adjust the radius of the circle as needed
+        circlePaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
   }
 }

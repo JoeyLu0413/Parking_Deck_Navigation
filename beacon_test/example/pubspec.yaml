@@ -1,5 +1,4 @@
-name: beacons_plugin_example
-description: Demonstrates how to use the beacons_plugin plugin.
+name: find_your_spot
 publish_to: 'none'
 
 environment:
@@ -15,6 +14,7 @@ dependencies:
   intl: ^0.17.0
   flutter_local_notifications: ^9.6.0
   http: ^1.1.0
+  tuple: ^2.0.2
 
 dev_dependencies:
   flutter_test:
